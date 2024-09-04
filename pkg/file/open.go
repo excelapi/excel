@@ -76,3 +76,50 @@ func Open(filepath, sheetName string) *Worksheet {
 
 	return &ws
 }
+
+// func (ws *Worksheet) headerRowIndex() (int, error) {
+// 	data := ws.Sheet.Rows
+// 	for i := 0; i < len(data); i++ {
+// 		if len(data[i].Cells) > 0 {
+// 			// potential header found
+// 			return i, nil
+// 		}
+// 	}
+// 	return 0, fmt.Errorf("unable to locate potential header row")
+// }
+
+// func (ws *Worksheet) suggestHeader(idx int) ([]string, error) {
+// 	header := ws.Sheet.Rows[idx]
+// 	headerStr := []string{}
+
+// 	for _, cell := range header.Cells {
+// 		if cell.Type == "s" {
+// 			idx, _ := strconv.Atoi(cell.Value)
+// 			headerStr = append(headerStr, ws.SS.StringItems[idx].T)
+// 		} else {
+// 			return []string{}, fmt.Errorf("all header names must be strings")
+// 		}
+// 	}
+
+// 	return headerStr, nil
+// }
+
+// func (ws *Worksheet) getString(c *Cell) string {
+// 	idx, _ := strconv.Atoi(c.Value)
+// 	return ws.SS.StringItems[idx].T
+// }
+
+// func (ws *Worksheet) ReadAll() {
+// 	for _, row := range ws.Sheet.Rows {
+// 		for _, cell := range row.Cells {
+// 			var value string
+// 			if cell.Type == "s" {
+// 				value = ws.getString(&cell)
+// 			} else {
+// 				// int, or somethign
+// 				value = cell.Type
+// 			}
+// 			fmt.Println(value)
+// 		}
+// 	}
+// }
