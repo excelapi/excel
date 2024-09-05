@@ -34,7 +34,7 @@ type Worksheet struct {
 
 type TablePrediction struct {
 	ColumnNames []string
-	ColumnTypes []string
+	ColumnTypes []string // ?: this array should be:  [int, varchar(13), varchar(255), datetime]
 	PrimaryKey  string
 }
 
