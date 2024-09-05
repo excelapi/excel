@@ -12,3 +12,15 @@ func TestOpen(t *testing.T) {
 
 	// file.ReadAll()
 }
+
+func TestPredictTable(t *testing.T) {
+	ws := file.Open("test.xlsx", "Sheet1")
+	prediction, err := ws.PredictTable()
+	if err != nil {
+		t.Fatalf("Error %v", err)
+	}
+
+	if prediction.PrimaryKey == "" {
+		t.Fatalf("primary key expected")
+	}
+}
