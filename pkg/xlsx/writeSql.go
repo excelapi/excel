@@ -72,3 +72,9 @@ func createTable(tp *TablePrediction) (string, error) {
 
 	return sql, nil
 }
+
+func ParseTablePrediction(body string) (*TablePrediction, error) {
+
+	// todo
+	return &TablePrediction{}, nil
+}

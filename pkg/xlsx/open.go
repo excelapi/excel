@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/xml"
 	"fmt"
+	"strconv"
 )
 
 type sharedStrings struct {
@@ -104,22 +105,23 @@ func Open(filepath, sheetName string) *Worksheet {
 // 	return headerStr, nil
 // }
 
-// func (ws *Worksheet) getString(c *Cell) string {
-// 	idx, _ := strconv.Atoi(c.Value)
-// 	return ws.SS.StringItems[idx].T
-// }
+func (ws *Worksheet) getString(c *Cell) string {
+	idx, _ := strconv.Atoi(c.Value)
+	return ws.SS.StringItems[idx].T
+}
 
-// func (ws *Worksheet) ReadAll() {
-// 	for _, row := range ws.Sheet.Rows {
-// 		for _, cell := range row.Cells {
-// 			var value string
-// 			if cell.Type == "s" {
-// 				value = ws.getString(&cell)
-// 			} else {
-// 				// int, or somethign
-// 				value = cell.Type
-// 			}
-// 			fmt.Println(value)
-// 		}
-// 	}
-// }
+func (ws *Worksheet) ReadAll() {
+	for _, row := range ws.Sheet.Rows {
+		fmt.Println("here")
+		for _, cell := range row.Cells {
+			var value string
+			if cell.Type == "s" {
+				value = ws.getString(&cell)
+			} else {
+				// int, or somethign
+				value = cell.Type
+			}
+			fmt.Println(value)
+		}
+	}
+}

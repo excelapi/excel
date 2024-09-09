@@ -1,0 +1,40 @@
+{
+    "tableName": "test_table",
+    "columns": [
+        {
+            "fileIdx": 0,
+            "columnName": "flight_id",
+            "columnType": "integer",
+            "decorators": [],
+            "primaryKey": false
+        },
+        {
+            "fileIdx": 1,
+            "columnName": "leg_id",
+            "columnType": "integer",
+            "decorators": [],
+            "primaryKey": true
+        },
+        {
+            "fileIdx": 3,
+            "columnName": "origin",
+            "columnType": "varchar(10)",
+            "decorators": [],
+            "primaryKey": false
+        },
+        {
+            "fileIdx": 4,
+            "columnName": "dest",
+            "columnType": "varchar(10)",
+            "decorators": [],
+            "primaryKey": false
+        },
+        {
+            "fileIdx": 8,
+            "columnName": "tail",
+            "columnType": "varchar(10)",
+            "decorators": [],
+            "primaryKey": true
+        }
+    ]
+}
