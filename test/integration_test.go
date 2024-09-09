@@ -1,7 +1,12 @@
 package test
 
 import (
+	"encoding/json"
+	"io"
+	"os"
 	"testing"
+
+	"github.com/excelapi/excel/pkg/xlsx"
 )
 
 // integration testing.
@@ -14,7 +19,18 @@ import (
 // }
 
 func TestWriteSql(t *testing.T) {
-	// file := xlsx.Open("/Users/joshuablackhurst/Desktop/TestExcel.xlsx", "sheet1")
+	file := xlsx.Open("/Users/joshuablackhurst/Desktop/TestExcel.xlsx", "sheet1")
 
-	// file.WriteSQL()
+	// pull in table-prediction.json
+	jsn, _ := os.Open("./json/table-prediction.json")
+
+	// get the bytes
+	bytes, _ := io.ReadAll(jsn)
+
+	// create table prediction
+	var tp xlsx.TablePrediction
+	json.Unmarshal(bytes, &tp)
+
+	// send tp to WriteSQL()
+	file.WriteSQL(&tp)
 }

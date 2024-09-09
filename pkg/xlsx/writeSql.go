@@ -25,10 +25,20 @@ func (ws *Worksheet) WriteSQL(tp *TablePrediction) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	fmt.Println(createStmt)
 
+	insertStmt, err := createInsert(tp, ws)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println(insertStmt)
+
 	return "s3/relative/path.file", nil
+}
+
+func createInsert(tp *TablePrediction, ws *Worksheet) (string, error) {
+
+	return "", nil
 }
 
 func createTable(tp *TablePrediction) (string, error) {
@@ -38,9 +48,12 @@ func createTable(tp *TablePrediction) (string, error) {
 
 	// head
 	sql := fmt.Sprintf("CREATE TABLE %v (\n", tp.TableName)
-	pk := "PRIMARY KEY ("
+	pk := "\tPRIMARY KEY ("
 
 	for _, col := range tp.Columns {
+		// tab
+		sql += "\t"
+
 		// column name
 		sql += col.ColumnName + " "
 
@@ -71,10 +84,4 @@ func createTable(tp *TablePrediction) (string, error) {
 	sql += pk + ")"
 
 	return sql, nil
-}
-
-func ParseTablePrediction(body string) (*TablePrediction, error) {
-
-	// todo
-	return &TablePrediction{}, nil
 }
