@@ -12,7 +12,7 @@ type sharedStrings struct {
 }
 
 type StringItem struct {
-	T string `xml:"t"`
+	Text string `xml:"t"`
 }
 
 type Sheet struct {
@@ -107,19 +107,18 @@ func Open(filepath, sheetName string) *Worksheet {
 
 func (ws *Worksheet) getString(c *Cell) string {
 	idx, _ := strconv.Atoi(c.Value)
-	return ws.SS.StringItems[idx].T
+	return ws.SS.StringItems[idx].Text
 }
 
 func (ws *Worksheet) ReadAll() {
 	for _, row := range ws.Sheet.Rows {
-		fmt.Println("here")
 		for _, cell := range row.Cells {
 			var value string
 			if cell.Type == "s" {
 				value = ws.getString(&cell)
 			} else {
-				// int, or somethign
-				value = cell.Type
+				// int, or something
+				value = cell.Value
 			}
 			fmt.Println(value)
 		}

@@ -12,14 +12,14 @@
             "fileIdx": 1,
             "columnName": "leg_id",
             "columnType": "integer",
-            "decorators": [],
+            "decorators": ["not null", "CHECK (leg_id >= 0)"],
             "primaryKey": true
         },
         {
             "fileIdx": 3,
             "columnName": "origin",
             "columnType": "varchar(10)",
-            "decorators": [],
+            "decorators": ["not null"],
             "primaryKey": false
         },
         {
@@ -33,7 +33,7 @@
             "fileIdx": 8,
             "columnName": "tail",
             "columnType": "varchar(10)",
-            "decorators": [],
+            "decorators": ["not null"],
             "primaryKey": true
         }
     ]
