@@ -68,28 +68,45 @@ func (ws *Worksheet) suggestHeader(idx int) ([]string, error) {
 }
 
 // predict the types based
-func (ws *Worksheet) predictColumnTypes(rowIdx int) []string {
-	row := ws.Sheet.Rows[rowIdx]
+func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
+	row := ws.Sheet.Rows[dataStart]
 	columnTypes := make([]string, len(row.Cells))
 
-	for i, cell := range row.Cells {
-		if cell.Type == "s" {
-			// todo: measure size of string
-			columnTypes[i] = "string"
-		} else {
-			// todo: make sure that they don't have numbers higher than the maximum allowed for ints
-			// ?: postgres doesn't allow for unsigned ints
-			// ?: smallint 2 bytes = -32768 to +32767
-			// ?: integer 4 bytes = -2147483648 to +2147483647
-			// ?: bigint 8 bytes = -9223372036854775808 to +9223372036854775807
-			// anything bigger should return an error
-			// should default to the smallest possible option.
-			columnTypes[i] = "int"
-		}
+	// wee need the header row and the column count for this
 
-		// ??: maybe we consider some kind of buffer for the columnTypes.... meaning if a max string length in a column is 200... should we set the max to 200+buffersize
-		// ??: pretend buffer size is 55... in our example we would set the column type to varchar(255) so as to accomidate for the max size plus future sizes...
-		// ??: same idea could apply to integers. Also nobody uses smallint. Also we sould have some detection to see if the value is a bool (always 0 or 1).kj
+	// i loops through each column once
+	// j will loop through each value in that column
+	for i := 0; i < columnCnt; i++ {
+		// get info about this column
+		// ? what's the column type
+		// ? the idx
+		for j := dataStart; j < len(ws.Sheet.Rows); j++ {
+			// ? determine maximum size of the datatype
+			// ? determine uniqueness
+			cell := ws.Sheet.Rows[j].Cells[i]
+			fmt.Println(cell)
+		}
+		// ? determine nullable?
+		// ? determine primary key eligible
 	}
+	// for i, cell := range row.Cells {
+	// if cell.Type == "s" {
+	// todo: measure size of string
+	// columnTypes[i] = "string"
+	// } else {
+	// todo: make sure that they don't have numbers higher than the maximum allowed for ints
+	// ?: postgres doesn't allow for unsigned ints
+	// ?: smallint 2 bytes = -32768 to +32767
+	// ?: integer 4 bytes = -2147483648 to +2147483647
+	// ?: bigint 8 bytes = -9223372036854775808 to +9223372036854775807
+	// anything bigger should return an error
+	// should default to the smallest possible option.
+	// columnTypes[i] = "int"
+	// }
+
+	// ??: maybe we consider some kind of buffer for the columnTypes.... meaning if a max string length in a column is 200... should we set the max to 200+buffersize
+	// ??: pretend buffer size is 55... in our example we would set the column type to varchar(255) so as to accomidate for the max size plus future sizes...
+	// ??: same idea could apply to integers. Also nobody uses smallint. Also we sould have some detection to see if the value is a bool (always 0 or 1).kj
+	// }
 	return columnTypes
 }
