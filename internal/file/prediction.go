@@ -2,6 +2,7 @@ package file
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 )
 
@@ -52,6 +53,7 @@ func (ws *Worksheet) headerRowIndex() (int, error) {
 }
 
 // headers based on row index
+// ? is this working?
 func (ws *Worksheet) suggestHeader(idx int) ([]string, error) {
 	header := ws.Sheet.Rows[idx]
 	headerStr := []string{}
@@ -67,6 +69,19 @@ func (ws *Worksheet) suggestHeader(idx int) ([]string, error) {
 	return headerStr, nil
 }
 
+type ColumnPrediction struct {
+	FileIdx    int
+	ColumnName string
+	ColumnType string
+	Decorators []string
+	PrimaryKey bool
+}
+
+type NTablePrediction struct {
+	TableName string
+	Columns   []ColumnPrediction
+}
+
 // predict the types based
 func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 	row := ws.Sheet.Rows[dataStart]
@@ -79,15 +94,16 @@ func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 	for i := 0; i < columnCnt; i++ {
 		// get info about this column
 		// ? what's the column type
-		// ? the idx
+		// ? the idx == i
 		for j := dataStart; j < len(ws.Sheet.Rows); j++ {
 			// ? determine maximum size of the datatype
 			// ? determine uniqueness
+			// ? determine empty values
 			cell := ws.Sheet.Rows[j].Cells[i]
-			fmt.Println(cell)
+			fmt.Println(cell.dataType())
 		}
-		// ? determine nullable?
-		// ? determine primary key eligible
+		// ? is nullable?
+		// ? is primary key eligible
 	}
 	// for i, cell := range row.Cells {
 	// if cell.Type == "s" {
@@ -109,4 +125,13 @@ func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 	// ??: same idea could apply to integers. Also nobody uses smallint. Also we sould have some detection to see if the value is a bool (always 0 or 1).kj
 	// }
 	return columnTypes
+}
+
+func (c *Cell) dataType() string {
+	if c.Type == "s" {
+		return "string"
+	} else {
+		// switch case
+		return reflect.TypeOf(c.Value).Name()
+	}
 }
