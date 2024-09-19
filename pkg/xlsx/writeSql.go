@@ -7,19 +7,6 @@ import (
 	"strings"
 )
 
-type ColumnPrediction struct {
-	FileIdx    int
-	ColumnName string
-	ColumnType string
-	Decorators []string
-	PrimaryKey bool
-}
-
-type TablePrediction struct {
-	TableName string
-	Columns   []ColumnPrediction
-}
-
 func (ws *Worksheet) getValue(cell *Cell) string {
 	var value string
 	if cell.Type == "s" {
