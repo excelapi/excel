@@ -2,7 +2,7 @@ package xlsx
 
 import (
 	"fmt"
-	"reflect"
+	"math"
 	"strconv"
 )
 
@@ -20,18 +20,19 @@ type TablePrediction struct {
 }
 
 func (ws *Worksheet) PredictTable() (*TablePrediction, error) {
-	// headerIdx, err := ws.headerRowIndex()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	headerIdx, err := ws.headerRowIndex()
+	if err != nil {
+		return nil, err
+	}
 
-	// columnNames, err := ws.suggestHeader(headerIdx)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	header, err := ws.suggestHeader(headerIdx)
+	if err != nil {
+		return nil, err
+	}
 
-	// dataRowIdx := headerIdx + 1
-	// columnTypes := ws.predictColumnTypes(dataRowIdx)
+	dataRowIdx := headerIdx + 1
+	columnTypes := ws.predictColumnTypes(dataRowIdx, len(header))
+	fmt.Println(columnTypes)
 
 	// predictedPK := columnNames[0]
 
@@ -87,16 +88,16 @@ func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 
 	// i loops through each column once
 	// j will loop through each value in that column
-	for i := 0; i < columnCnt; i++ {
+	for i := 0; i < 1; i++ {
 		// get info about this column
-		// ? what's the column type
 		// ? the idx == i
-		for j := dataStart; j < len(ws.Sheet.Rows); j++ {
+		for j := dataStart; j < 5; j++ {
+			// ? determine cell type
+			cell := ws.Sheet.Rows[j].Cells[i]
+			fmt.Println(j, i, cell.dataType(), ws.getValue(&cell))
 			// ? determine maximum size of the datatype
 			// ? determine uniqueness
 			// ? determine empty values
-			cell := ws.Sheet.Rows[j].Cells[i]
-			fmt.Println(cell.dataType())
 		}
 		// ? is nullable?
 		// ? is primary key eligible
@@ -118,7 +119,7 @@ func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 
 	// ??: maybe we consider some kind of buffer for the columnTypes.... meaning if a max string length in a column is 200... should we set the max to 200+buffersize
 	// ??: pretend buffer size is 55... in our example we would set the column type to varchar(255) so as to accomidate for the max size plus future sizes...
-	// ??: same idea could apply to integers. Also nobody uses smallint. Also we sould have some detection to see if the value is a bool (always 0 or 1).kj
+	// ??: same idea could apply to integers. Also nobody uses smallint. Also we sould have some detection to see if the value is a bool (always 0 or 1).
 	// }
 	return columnTypes
 }
@@ -127,7 +128,13 @@ func (c *Cell) dataType() string {
 	if c.Type == "s" {
 		return "string"
 	} else {
-		// switch case
-		return reflect.TypeOf(c.Value).Name()
+		if d, err := strconv.ParseFloat(c.Value, 64); err != nil {
+			if math.Mod(d, 1) == 0 {
+				return "int"
+			}
+			return "float64"
+		}
+
+		return "string"
 	}
 }

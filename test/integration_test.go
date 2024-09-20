@@ -1,9 +1,6 @@
 package test
 
 import (
-	"encoding/json"
-	"io"
-	"os"
 	"testing"
 
 	"github.com/excelapi/excel/pkg/xlsx"
@@ -18,19 +15,25 @@ import (
 // 	file.ReadAll()
 // }
 
-func TestWriteSql(t *testing.T) {
-	file := xlsx.Open("/Users/joshuablackhurst/Desktop/TestExcel.xlsx", "sheet1")
+// func TestWriteSql(t *testing.T) {
+// 	file := xlsx.Open("/Users/joshuablackhurst/Desktop/TestExcel.xlsx", "sheet1")
 
-	// pull in table-prediction.json
-	jsn, _ := os.Open("./json/table-prediction.json")
+// 	// pull in table-prediction.json
+// 	jsn, _ := os.Open("./json/table-prediction.json")
 
-	// get the bytes
-	bytes, _ := io.ReadAll(jsn)
+// 	// get the bytes
+// 	bytes, _ := io.ReadAll(jsn)
 
-	// create table prediction
-	var tp xlsx.TablePrediction
-	json.Unmarshal(bytes, &tp)
+// 	// create table prediction
+// 	var tp xlsx.TablePrediction
+// 	json.Unmarshal(bytes, &tp)
 
-	// send tp to WriteSQL()
-	file.WriteSQL(&tp)
+// 	// send tp to WriteSQL()
+// 	file.WriteSQL(&tp)
+// }
+
+func TestTablePrediction(t *testing.T) {
+	file := xlsx.Open("/Users/joshuablackhurst/source/repos/personal/excel/raw/TestExcel.xlsx", "sheet1")
+
+	file.PredictTable()
 }
