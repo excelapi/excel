@@ -75,39 +75,40 @@ func Open(filepath, sheetName string) *Worksheet {
 		}
 	}
 
+	// todo: filter out empty rows
+	ws.filterEmptyRows()
+
 	return &ws
 }
 
-// func (ws *Worksheet) headerRowIndex() (int, error) {
-// 	data := ws.Sheet.Rows
-// 	for i := 0; i < len(data); i++ {
-// 		if len(data[i].Cells) > 0 {
-// 			// potential header found
-// 			return i, nil
-// 		}
-// 	}
-// 	return 0, fmt.Errorf("unable to locate potential header row")
-// }
+func (ws *Worksheet) isRowEmpty(row Row) bool {
+	for _, cell := range row.Cells {
+		if ws.getValue(&cell) != "" {
+			return false
+		}
+	}
+	return true
+}
 
-// func (ws *Worksheet) suggestHeader(idx int) ([]string, error) {
-// 	header := ws.Sheet.Rows[idx]
-// 	headerStr := []string{}
+func (ws *Worksheet) filterEmptyRows() {
+	var nonEmptyRows []Row
+	for _, row := range ws.Sheet.Rows {
+		if !ws.isRowEmpty(row) {
+			nonEmptyRows = append(nonEmptyRows, row)
+		}
+	}
+	ws.Sheet.Rows = nonEmptyRows
+}
 
-// 	for _, cell := range header.Cells {
-// 		if cell.Type == "s" {
-// 			idx, _ := strconv.Atoi(cell.Value)
-// 			headerStr = append(headerStr, ws.SS.StringItems[idx].T)
-// 		} else {
-// 			return []string{}, fmt.Errorf("all header names must be strings")
-// 		}
-// 	}
-
-// 	return headerStr, nil
-// }
-
-func (ws *Worksheet) getString(c *Cell) string {
-	idx, _ := strconv.Atoi(c.Value)
-	return ws.SS.StringItems[idx].Text
+func (ws *Worksheet) getValue(cell *Cell) string {
+	var value string
+	if cell.Type == "s" {
+		idx, _ := strconv.Atoi(cell.Value)
+		value = ws.SS.StringItems[idx].Text
+	} else {
+		value = cell.Value
+	}
+	return value
 }
 
 func (ws *Worksheet) ReadAll() {
@@ -115,7 +116,7 @@ func (ws *Worksheet) ReadAll() {
 		for _, cell := range row.Cells {
 			var value string
 			if cell.Type == "s" {
-				value = ws.getString(&cell)
+				value = ws.getValue(&cell)
 			} else {
 				// int, or something
 				value = cell.Value
@@ -123,4 +124,7 @@ func (ws *Worksheet) ReadAll() {
 			fmt.Println(value)
 		}
 	}
+
+	fmt.Println("Rows: ", len(ws.Sheet.Rows))
+	fmt.Println("First col length: ", len(ws.Sheet.Rows[0].Cells))
 }

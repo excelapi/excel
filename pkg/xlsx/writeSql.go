@@ -3,21 +3,8 @@ package xlsx
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
-
-func (ws *Worksheet) getValue(cell *Cell) string {
-	var value string
-	if cell.Type == "s" {
-		idx, _ := strconv.Atoi(cell.Value)
-		value = ws.SS.StringItems[idx].Text
-	} else {
-		// int, or something
-		value = cell.Value
-	}
-	return value
-}
 
 func (ws *Worksheet) WriteSQL(tp *TablePrediction) (string, error) {
 	// Build CREATE statement
