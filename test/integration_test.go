@@ -9,11 +9,29 @@ import (
 // integration testing.
 // write function that uses this package as if it was a seperate application
 
-// func TestOpen(t *testing.T) {
+func TestOpen(t *testing.T) {
+	file := xlsx.Open("/Users/joshuablackhurst/source/repos/personal/excel/raw/TestExcel.xlsx", "sheet1")
+
+	file.ReadAll()
+}
+
+// func TestWriteSql(t *testing.T) {
 // 	file := xlsx.Open("/Users/joshuablackhurst/Desktop/TestExcel.xlsx", "sheet1")
 
-// 	file.ReadAll()
+// 	// pull in table-prediction.json
+// 	jsn, _ := os.Open("./json/table-prediction.json")
+
+// 	// get the bytes
+// 	bytes, _ := io.ReadAll(jsn)
+
+// 	// create table prediction
+// 	var tp xlsx.TablePrediction
+// 	json.Unmarshal(bytes, &tp)
+
+// 	// send tp to WriteSQL()
+// 	file.WriteSQL(&tp)
 // }
+<<<<<<< HEAD
 
 // func TestWriteSql(t *testing.T) {
 // 	file := xlsx.Open("/Users/joshuablackhurst/Desktop/TestExcel.xlsx", "sheet1")
@@ -37,3 +55,5 @@ func TestTablePrediction(t *testing.T) {
 
 	file.PredictTable()
 }
+=======
+>>>>>>> origin/joshua/filter-empty-rows

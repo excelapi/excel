@@ -75,9 +75,13 @@ func Open(filepath, sheetName string) *Worksheet {
 		}
 	}
 
+	// todo: filter out empty rows
+	ws.filterEmptyRows()
+
 	return &ws
 }
 
+<<<<<<< HEAD
 func (ws *Worksheet) getValue(cell *Cell) string {
 	var value string
 	if cell.Type == "s" {
@@ -100,11 +104,28 @@ func (ws *Worksheet) getValue(cell *Cell) string {
 // 	}
 // 	return 0, fmt.Errorf("unable to locate potential header row")
 // }
+=======
+func (ws *Worksheet) isRowEmpty(row Row) bool {
+	for _, cell := range row.Cells {
+		if ws.getValue(&cell) != "" {
+			return false
+		}
+	}
+	return true
+}
+>>>>>>> origin/joshua/filter-empty-rows
 
-// func (ws *Worksheet) suggestHeader(idx int) ([]string, error) {
-// 	header := ws.Sheet.Rows[idx]
-// 	headerStr := []string{}
+func (ws *Worksheet) filterEmptyRows() {
+	var nonEmptyRows []Row
+	for _, row := range ws.Sheet.Rows {
+		if !ws.isRowEmpty(row) {
+			nonEmptyRows = append(nonEmptyRows, row)
+		}
+	}
+	ws.Sheet.Rows = nonEmptyRows
+}
 
+<<<<<<< HEAD
 // 	for _, cell := range header.Cells {
 // 		if cell.Type == "s" {
 // 			idx, _ := strconv.Atoi(cell.Value)
@@ -136,3 +157,33 @@ func (ws *Worksheet) getValue(cell *Cell) string {
 // 		}
 // 	}
 // }
+=======
+func (ws *Worksheet) getValue(cell *Cell) string {
+	var value string
+	if cell.Type == "s" {
+		idx, _ := strconv.Atoi(cell.Value)
+		value = ws.SS.StringItems[idx].Text
+	} else {
+		value = cell.Value
+	}
+	return value
+}
+
+func (ws *Worksheet) ReadAll() {
+	for _, row := range ws.Sheet.Rows {
+		for _, cell := range row.Cells {
+			var value string
+			if cell.Type == "s" {
+				value = ws.getValue(&cell)
+			} else {
+				// int, or something
+				value = cell.Value
+			}
+			fmt.Println(value)
+		}
+	}
+
+	fmt.Println("Rows: ", len(ws.Sheet.Rows))
+	fmt.Println("First col length: ", len(ws.Sheet.Rows[0].Cells))
+}
+>>>>>>> origin/joshua/filter-empty-rows
