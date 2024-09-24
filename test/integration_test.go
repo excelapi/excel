@@ -31,7 +31,6 @@ func TestOpen(t *testing.T) {
 // 	// send tp to WriteSQL()
 // 	file.WriteSQL(&tp)
 // }
-<<<<<<< HEAD
 
 // func TestWriteSql(t *testing.T) {
 // 	file := xlsx.Open("/Users/joshuablackhurst/Desktop/TestExcel.xlsx", "sheet1")
@@ -55,5 +54,3 @@ func TestTablePrediction(t *testing.T) {
 
 	file.PredictTable()
 }
-=======
->>>>>>> origin/joshua/filter-empty-rows

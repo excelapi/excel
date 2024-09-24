@@ -81,30 +81,6 @@ func Open(filepath, sheetName string) *Worksheet {
 	return &ws
 }
 
-<<<<<<< HEAD
-func (ws *Worksheet) getValue(cell *Cell) string {
-	var value string
-	if cell.Type == "s" {
-		idx, _ := strconv.Atoi(cell.Value)
-		value = ws.SS.StringItems[idx].Text
-	} else {
-		// int, or something
-		value = cell.Value
-	}
-	return value
-}
-
-// func (ws *Worksheet) headerRowIndex() (int, error) {
-// 	data := ws.Sheet.Rows
-// 	for i := 0; i < len(data); i++ {
-// 		if len(data[i].Cells) > 0 {
-// 			// potential header found
-// 			return i, nil
-// 		}
-// 	}
-// 	return 0, fmt.Errorf("unable to locate potential header row")
-// }
-=======
 func (ws *Worksheet) isRowEmpty(row Row) bool {
 	for _, cell := range row.Cells {
 		if ws.getValue(&cell) != "" {
@@ -113,7 +89,6 @@ func (ws *Worksheet) isRowEmpty(row Row) bool {
 	}
 	return true
 }
->>>>>>> origin/joshua/filter-empty-rows
 
 func (ws *Worksheet) filterEmptyRows() {
 	var nonEmptyRows []Row
@@ -125,39 +100,6 @@ func (ws *Worksheet) filterEmptyRows() {
 	ws.Sheet.Rows = nonEmptyRows
 }
 
-<<<<<<< HEAD
-// 	for _, cell := range header.Cells {
-// 		if cell.Type == "s" {
-// 			idx, _ := strconv.Atoi(cell.Value)
-// 			headerStr = append(headerStr, ws.SS.StringItems[idx].T)
-// 		} else {
-// 			return []string{}, fmt.Errorf("all header names must be strings")
-// 		}
-// 	}
-
-// 	return headerStr, nil
-// }
-
-// func (ws *Worksheet) getString(c *Cell) string {
-// 	idx, _ := strconv.Atoi(c.Value)
-// 	return ws.SS.StringItems[idx].Text
-// }
-
-// func (ws *Worksheet) ReadAll() {
-// 	for _, row := range ws.Sheet.Rows {
-// 		for _, cell := range row.Cells {
-// 			var value string
-// 			if cell.Type == "s" {
-// 				value = ws.getString(&cell)
-// 			} else {
-// 				// int, or something
-// 				value = cell.Value
-// 			}
-// 			fmt.Println(value)
-// 		}
-// 	}
-// }
-=======
 func (ws *Worksheet) getValue(cell *Cell) string {
 	var value string
 	if cell.Type == "s" {
@@ -186,4 +128,3 @@ func (ws *Worksheet) ReadAll() {
 	fmt.Println("Rows: ", len(ws.Sheet.Rows))
 	fmt.Println("First col length: ", len(ws.Sheet.Rows[0].Cells))
 }
->>>>>>> origin/joshua/filter-empty-rows
