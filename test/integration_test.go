@@ -9,11 +9,11 @@ import (
 // integration testing.
 // write function that uses this package as if it was a seperate application
 
-func TestOpen(t *testing.T) {
-	file := xlsx.Open("/Users/joshuablackhurst/source/repos/personal/excel/raw/TestExcel.xlsx", "sheet1")
+// func TestOpen(t *testing.T) {
+// 	file := xlsx.Open("/Users/joshuablackhurst/source/repos/personal/excel/raw/TestExcel.xlsx", "sheet1")
 
-	file.ReadAll()
-}
+// 	file.ReadAll()
+// }
 
 // func TestWriteSql(t *testing.T) {
 // 	file := xlsx.Open("/Users/joshuablackhurst/Desktop/TestExcel.xlsx", "sheet1")

@@ -51,7 +51,7 @@ func (ws *Worksheet) headerRowIndex() (int, error) {
 	// find first row with cells
 	for i := 0; i < len(data); i++ {
 		row := data[i]
-		fmt.Printf("Row %d has %d cells\n", i, len(row.Cells))
+		// fmt.Printf("Row %d has %d cells\n", i, len(row.Cells))
 
 		// if row contains cells
 		if len(row.Cells) > 0 {
@@ -88,34 +88,13 @@ func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 
 	// i loops through each column once
 	// j will loop through each value in that column
-	for i := 0; i < 1; i++ {
+	for i := 0; i < columnCnt; i++ {
 		// get info about this column
 		// ? the idx == i
-		for j := dataStart; j < 5; j++ {
-			// ? determine cell type
-			cell := ws.Sheet.Rows[j].Cells[i]
-			fmt.Println(j, i, cell.dataType(), ws.getValue(&cell))
-			// ? determine maximum size of the datatype
-			// ? determine uniqueness
-			// ? determine empty values
-		}
-		// ? is nullable?
-		// ? is primary key eligible
+		startingCell := ws.Sheet.Rows[dataStart].Cells[i]
+		colType := ws.determineColumnType(dataStart, i, "", startingCell)
+		fmt.Println(colType)
 	}
-	// for i, cell := range row.Cells {
-	// if cell.Type == "s" {
-	// todo: measure size of string
-	// columnTypes[i] = "string"
-	// } else {
-	// todo: make sure that they don't have numbers higher than the maximum allowed for ints
-	// ?: postgres doesn't allow for unsigned ints
-	// ?: smallint 2 bytes = -32768 to +32767
-	// ?: integer 4 bytes = -2147483648 to +2147483647
-	// ?: bigint 8 bytes = -9223372036854775808 to +9223372036854775807
-	// anything bigger should return an error
-	// should default to the smallest possible option.
-	// columnTypes[i] = "int"
-	// }
 
 	// ??: maybe we consider some kind of buffer for the columnTypes.... meaning if a max string length in a column is 200... should we set the max to 200+buffersize
 	// ??: pretend buffer size is 55... in our example we would set the column type to varchar(255) so as to accomidate for the max size plus future sizes...
@@ -127,14 +106,42 @@ func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 func (c *Cell) dataType() string {
 	if c.Type == "s" {
 		return "string"
+	} else if c.Type == "b" {
+		return "boolean"
 	} else {
-		if d, err := strconv.ParseFloat(c.Value, 64); err != nil {
-			if math.Mod(d, 1) == 0 {
-				return "int"
-			}
-			return "float64"
+		d, err := strconv.ParseFloat(c.Value, 64)
+		if err != nil {
+			fmt.Println("datatype error: ", err.Error())
+			return "string"
 		}
 
+		if math.Mod(d, 1) == 0 {
+			return "int"
+		}
+		return "float64"
+	}
+}
+
+// ? determine precision !! BIG DEAL
+// ? determine uniqueness
+// ? determine empty values
+// ? is nullable?
+// ? is primary key eligible
+func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cell) string {
+	if prevType == "string" {
 		return "string"
 	}
+	// todo: check for boolean type
+
+	// determine cell type
+	cellType := cell.dataType()
+
+	// todo: determine if int or floath
+
+	// check if on last row
+	if row == len(ws.Sheet.Rows)-1 {
+		return cellType
+	}
+
+	return ws.determineColumnType(row+1, col, cellType, ws.Sheet.Rows[row+1].Cells[col])
 }
