@@ -11,6 +11,7 @@ type ColumnPrediction struct {
 	ColumnName string
 	ColumnType string
 	Decorators []string
+	NotNull    bool
 	PrimaryKey bool
 }
 
@@ -91,9 +92,10 @@ func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 	for i := 0; i < columnCnt; i++ {
 		// get info about this column
 		// ? the idx == i
-		startingCell := ws.Sheet.Rows[dataStart].Cells[i]
-		colType := ws.determineColumnType(dataStart, i, "", startingCell)
-		fmt.Println(colType)
+		// startingCell := ws.Sheet.Rows[dataStart].Cells[i]
+		cp := &ColumnPrediction{}
+		// cp := ws.determineColumnType(dataStart, i, "", startingCell, cp)
+		fmt.Println(cp)
 	}
 
 	// ??: maybe we consider some kind of buffer for the columnTypes.... meaning if a max string length in a column is 200... should we set the max to 200+buffersize
@@ -116,7 +118,7 @@ func (c *Cell) dataType() string {
 		}
 
 		if math.Mod(d, 1) == 0 {
-			return "int"
+			return "integer"
 		}
 		return "float64"
 	}
@@ -127,21 +129,64 @@ func (c *Cell) dataType() string {
 // ? determine empty values
 // ? is nullable?
 // ? is primary key eligible
-func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cell) string {
-	if prevType == "string" {
-		return "string"
+func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cell, precision int, dups *map[string]bool, cp *ColumnPrediction) *ColumnPrediction {
+	if cp.PrimaryKey || cp.NotNull {
+		// get value
+		value := ws.getValue(&cell)
+
+		if (*dups)[value] == true {
+			cp.PrimaryKey = false
+		} else {
+			(*dups)[value] = true
+		}
+
+		// check if value is empty
+		// if empty, remove pk and not null eligable
+		if value == "" {
+			// remove pk and not null
+			cp.PrimaryKey = false
+			cp.NotNull = false
+		}
 	}
-	// todo: check for boolean type
 
 	// determine cell type
 	cellType := cell.dataType()
 
-	// todo: determine if int or floath
+	if prevType == "string" {
+		// the type must remain a string
 
-	// check if on last row
-	if row == len(ws.Sheet.Rows)-1 {
-		return cellType
+		// get precision
+
+		// if precision is bigger than before, replace
+		// else just use old precision
+
 	}
 
-	return ws.determineColumnType(row+1, col, cellType, ws.Sheet.Rows[row+1].Cells[col])
+	// ??? HOWWWWW?????
+
+	if prevType == "boolean" {
+		if cellType == prevType {
+			// remains the same
+		} else {
+			// it's different
+		}
+	}
+
+	if prevType == "float64" {
+		if cellType == prevType {
+			// remains the same
+		} else {
+			// it's different
+		}
+	}
+
+	if prevType == "integer" {
+		if cellType == prevType {
+			// remains the same
+		} else {
+			// it's different
+		}
+	}
+
+	// return a default case...??
 }
