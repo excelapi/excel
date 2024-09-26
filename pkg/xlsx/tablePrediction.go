@@ -92,9 +92,8 @@ func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
 	for i := 0; i < columnCnt; i++ {
 		// get info about this column
 		// ? the idx == i
-		// startingCell := ws.Sheet.Rows[dataStart].Cells[i]
-		cp := &ColumnPrediction{}
-		// cp := ws.determineColumnType(dataStart, i, "", startingCell, cp)
+		startingCell := ws.Sheet.Rows[dataStart].Cells[i]
+		cp := ws.determineColumnType(dataStart, i, "", startingCell, 0, &map[string]bool{}, &ColumnPrediction{})
 		fmt.Println(cp)
 	}
 
@@ -129,12 +128,14 @@ func (c *Cell) dataType() string {
 // ? determine empty values
 // ? is nullable?
 // ? is primary key eligible
-func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cell, precision int, dups *map[string]bool, cp *ColumnPrediction) *ColumnPrediction {
+func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cell, precision int, dups *map[string]bool, cp *ColumnPrediction) string {
+
+	// check if pk and NotNull are still options
 	if cp.PrimaryKey || cp.NotNull {
 		// get value
 		value := ws.getValue(&cell)
 
-		if (*dups)[value] == true {
+		if (*dups)[value] {
 			cp.PrimaryKey = false
 		} else {
 			(*dups)[value] = true
@@ -149,44 +150,35 @@ func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cel
 		}
 	}
 
+	// the type must remain a string
+
+	// get precision
+
+	// if precision is bigger than before, replace
+	// else just use old precision
+
 	// determine cell type
 	cellType := cell.dataType()
 
-	if prevType == "string" {
-		// the type must remain a string
+	// if it changes, we're likely to just change it to a string
+	if prevType != cellType {
+		// we want to allow the int -> float change
+		if prevType != "integer" && cellType != "float64" {
+			// new type is just going to be a string
 
-		// get precision
-
-		// if precision is bigger than before, replace
-		// else just use old precision
-
-	}
-
-	// ??? HOWWWWW?????
-
-	if prevType == "boolean" {
-		if cellType == prevType {
-			// remains the same
-		} else {
-			// it's different
+			// check that we can go another
+			if row+1 < len(ws.Sheet.Rows) {
+				return ws.determineColumnType(row+1, col, "string", ws.Sheet.Rows[row+1].Cells[col], precision, dups, cp)
+			} else {
+				return cellType
+			}
 		}
 	}
 
-	if prevType == "float64" {
-		if cellType == prevType {
-			// remains the same
-		} else {
-			// it's different
-		}
+	if row+1 < len(ws.Sheet.Rows) {
+		// type didn't change
+		return ws.determineColumnType(row+1, col, cellType, ws.Sheet.Rows[row+1].Cells[col], precision, dups, cp)
+	} else {
+		return cellType
 	}
-
-	if prevType == "integer" {
-		if cellType == prevType {
-			// remains the same
-		} else {
-			// it's different
-		}
-	}
-
-	// return a default case...??
 }
