@@ -32,8 +32,8 @@ func (ws *Worksheet) PredictTable() (*TablePrediction, error) {
 	}
 
 	dataRowIdx := headerIdx + 1
-	columnTypes := ws.predictColumnTypes(dataRowIdx, len(header))
-	fmt.Println(columnTypes)
+	columnPredictions := ws.predictColumnTypes(dataRowIdx, header)
+	fmt.Println(columnPredictions)
 
 	// predictedPK := columnNames[0]
 
@@ -81,27 +81,26 @@ func (ws *Worksheet) suggestHeader(idx int) ([]string, error) {
 }
 
 // predict the types based
-func (ws *Worksheet) predictColumnTypes(dataStart int, columnCnt int) []string {
-	row := ws.Sheet.Rows[dataStart]
-	columnTypes := make([]string, len(row.Cells))
+func (ws *Worksheet) predictColumnTypes(dataStart int, header []string) []ColumnPrediction {
 
-	// wee need the header row and the column count for this
+	columnPredictions := []ColumnPrediction{}
 
 	// i loops through each column once
-	// j will loop through each value in that column
-	for i := 0; i < columnCnt; i++ {
-		// get info about this column
-		// ? the idx == i
+	// datastart is the row that we think data starts on
+	for i := 0; i < len(header); i++ {
+		// starting cell
 		startingCell := ws.Sheet.Rows[dataStart].Cells[i]
-		cp := ws.determineColumnType(dataStart, i, "", startingCell, 0, &map[string]bool{}, &ColumnPrediction{})
-		fmt.Println(cp)
+
+		// loop through each row in a single column to get the cp (column prediction)
+		cp := ws.determineColumnType(dataStart, i, "", startingCell, &map[string]bool{}, &ColumnPrediction{FileIdx: i, NotNull: true, PrimaryKey: true})
+
+		// add column name to the cp
+		cp.ColumnName = header[i]
+
+		columnPredictions = append(columnPredictions, *cp)
 	}
 
-	// ??: maybe we consider some kind of buffer for the columnTypes.... meaning if a max string length in a column is 200... should we set the max to 200+buffersize
-	// ??: pretend buffer size is 55... in our example we would set the column type to varchar(255) so as to accomidate for the max size plus future sizes...
-	// ??: same idea could apply to integers. Also nobody uses smallint. Also we sould have some detection to see if the value is a bool (always 0 or 1).
-	// }
-	return columnTypes
+	return columnPredictions
 }
 
 func (c *Cell) dataType() string {
@@ -128,7 +127,7 @@ func (c *Cell) dataType() string {
 // ? determine empty values
 // ? is nullable?
 // ? is primary key eligible
-func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cell, precision int, dups *map[string]bool, cp *ColumnPrediction) string {
+func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cell, dups *map[string]bool, cp *ColumnPrediction) *ColumnPrediction {
 
 	// check if pk and NotNull are still options
 	if cp.PrimaryKey || cp.NotNull {
@@ -149,36 +148,45 @@ func (ws *Worksheet) determineColumnType(row, col int, prevType string, cell Cel
 			cp.NotNull = false
 		}
 	}
-
-	// the type must remain a string
-
-	// get precision
+	// determine cell type
+	cellType := cell.dataType()
 
 	// if precision is bigger than before, replace
 	// else just use old precision
-
-	// determine cell type
-	cellType := cell.dataType()
 
 	// if it changes, we're likely to just change it to a string
 	if prevType != cellType {
 		// we want to allow the int -> float change
 		if prevType != "integer" && cellType != "float64" {
 			// new type is just going to be a string
-
 			// check that we can go another
 			if row+1 < len(ws.Sheet.Rows) {
-				return ws.determineColumnType(row+1, col, "string", ws.Sheet.Rows[row+1].Cells[col], precision, dups, cp)
+				return ws.determineColumnType(row+1, col, "string", ws.Sheet.Rows[row+1].Cells[col], dups, cp)
 			} else {
-				return cellType
+				cp.ColumnType = dateTypeToColumnType(cellType)
+				return cp
 			}
 		}
 	}
 
 	if row+1 < len(ws.Sheet.Rows) {
 		// type didn't change
-		return ws.determineColumnType(row+1, col, cellType, ws.Sheet.Rows[row+1].Cells[col], precision, dups, cp)
+		return ws.determineColumnType(row+1, col, cellType, ws.Sheet.Rows[row+1].Cells[col], dups, cp)
 	} else {
-		return cellType
+		cp.ColumnType = dateTypeToColumnType(cellType)
+		return cp
+	}
+}
+
+func dateTypeToColumnType(t string) string {
+	switch t {
+	case "string":
+		return "TEXT"
+	case "integer":
+		return "INTEGER"
+	case "float64":
+		return "DOUBLE PRECISION"
+	default:
+		return "TEXT"
 	}
 }
